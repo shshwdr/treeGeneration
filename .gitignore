@@ -1,0 +1,54 @@
+# =============== #
+# Unity generated #
+# =============== #
+/.vs/
+/Temp/
+/Obj/
+/UnityGenerated/
+/Library/
+/Assets/AssetStoreTools*
+/builds/
+/windowsBuild/
+/build/
+/Editor/
+/buildWindows/
+/pakcedBuild
+/Logs/
+/UserSettings/
+/*.zip
+# ===================================== #
+# Visual Studio / MonoDevelop generated #
+# ===================================== #
+ExportedObj/
+*.apk
+*.aab
+*.keystore
+*.svd
+*.userprefs
+*.csproj
+*.pidb
+*.suo
+*.sln
+*.user
+*.unityproj
+*.booproj
+*.log
+
+# ============ #
+# OS generated #
+# ============ #
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+# ============ #
+# FMOD #
+# ============ #
+/[Aa]ssets/Plugins/FMOD/Cache/*
+/Assets/FMODAssets/*
+/Assets/FMODStudioCache.meta
