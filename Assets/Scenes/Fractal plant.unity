@@ -1101,13 +1101,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   initRadius: 300
-  treeThickness: 0.1
-  branchCurve: 0.33
+  treeThickness: 1
   forwardCurve: 0
   rotationDegree: 55
   rotationDegreeRandom: 0
   iteration: 1
-  length: 0.05
+  length: 2
   widthDecrease: 0.8
   treeThicknessScale: 2
   branchPrefab: {fileID: 1827870571615651222, guid: 0ac01edfb63be5b4c98c87196b77600a,

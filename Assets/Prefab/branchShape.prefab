@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4853213946311999418}
   - component: {fileID: 4853213946311999412}
   - component: {fileID: 4853213946311999413}
+  - component: {fileID: -5759216574499106310}
   m_Layer: 0
   m_Name: branchShape
   m_TagString: Untagged
@@ -160,3 +161,18 @@ MonoBehaviour:
   m_EnableTangents: 0
   m_GeometryCached: 0
   m_UTess2D: 0
+--- !u!114 &-5759216574499106310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4853213946311999419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b018adb4100b7214c8e78b683ae91425, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  growSpeed: 5
+  branchCurve: 0.3
+  equalAllowance: 0.01

@@ -16,7 +16,6 @@ public class FractalPlant : MonoBehaviour
     LineGenerator lineGenerator = default;
     [SerializeField] float initRadius = 300f;
     [SerializeField] float treeThickness = 2f;
-    [SerializeField] float branchCurve = 0.3f;
     [SerializeField] float forwardCurve = 10f;
     [SerializeField]
     float rotationDegree = 25;
@@ -97,6 +96,25 @@ public class FractalPlant : MonoBehaviour
         return go;
     }
 
+    void calculateNextPosition(float curve, ref Vector3 position, ref float degree, GameObject currentBranch = null, float thickness = 1)
+    {
+        {
+
+            degree += curve;// + Random.Range(-rotationDegreeRandom, rotationDegreeRandom);
+        }
+        Vector3 angle = new Vector3(0, 0, degree);
+        var q = Quaternion.AngleAxis(degree, Vector3.forward);
+        var newPosition = position;
+
+            newPosition = position + q * Vector3.right * length;
+
+
+
+        currentBranch.GetComponent<BranchGrowth>().updatePoint(position, newPosition, branchIndex, thickness * treeThickness);
+        position = newPosition;
+
+    }
+
     GameObject drawForward2(DrawType type, float curve, ref Vector3 position, ref float degree, GameObject go, ref int order, GameObject currentBranch = null, float width = 1)
     {
         //if (shouldCurve)
@@ -137,108 +155,14 @@ public class FractalPlant : MonoBehaviour
     }
 
 
-    GameObject drawForward(DrawType type, float curve, ref Vector3 position, ref float degree, GameObject go, ref int order, GameObject currentBranch = null, int depth = 1, int maxDepth = 1)
-    {
-        //if (shouldCurve)
-        {
-
-            degree += curve;// + Random.Range(-rotationDegreeRandom, rotationDegreeRandom);
-        }
-        Vector3 angle = new Vector3(0, 0, degree);
-        var q = Quaternion.AngleAxis(degree, Vector3.forward);
-        var newPosition = position;
-        maxY = Mathf.Max(newPosition.y, maxY);
-        minY = Mathf.Min(newPosition.y, minY);
-        maxX = Mathf.Max(newPosition.x, maxX);
-        minX = Mathf.Min(newPosition.x, minX);
-        if (type == DrawType.branch)
-        {
-
-            newPosition = position + q * Vector3.right * length;
-
-            if (currentBranch == null)
-            {
-                Debug.Log("?");
-            }
-            else
-            {
-                addBranch(currentBranch, depth, maxDepth, newPosition, position, ref order);
-            }
-        }
-        //var newPosition = position + angle * length;
-        var ob = connect(position, newPosition, angle, type, go);
-        position = newPosition;
-        if (type != DrawType.branch)
-        {
-            flowersAndLeaves.Add(ob.GetComponent<SpriteRenderer>());
-
-            ob.GetComponent<SpriteRenderer>().enabled = showFlower;
-            ob.GetComponent<SpriteRenderer>().sortingOrder = order + 1;
-        }
-        return ob;
-    }
-
-    private void Smoothen(SpriteShapeController sc, int pointIndex)
-
-    {
-        if (pointIndex < 1)
-        {
-            return;
-        }
-        Vector3 position = sc.spline.GetPosition(pointIndex);
-
-        Vector3 positionNext = sc.spline.GetPosition(SplineUtility.NextIndex(pointIndex, sc.spline.GetPointCount()));
-
-        Vector3 positionPrev = sc.spline.GetPosition(SplineUtility.PreviousIndex(pointIndex, sc.spline.GetPointCount()));
-
-        Vector3 forward = gameObject.transform.forward;
-
-
-
-        float scale = Mathf.Min((positionNext - position).magnitude, (positionPrev - position).magnitude) * branchCurve;
-
-
-
-        Vector3 leftTangent = (positionPrev - position).normalized * scale;
-
-        Vector3 rightTangent = (positionNext - position).normalized * scale;
-
-
-
-        sc.spline.SetTangentMode(pointIndex, ShapeTangentMode.Continuous);
-
-        SplineUtility.CalculateTangents(position, positionPrev, positionNext, forward, scale, out rightTangent, out leftTangent);
-
-
-
-        sc.spline.SetLeftTangent(pointIndex, leftTangent);
-
-        sc.spline.SetRightTangent(pointIndex, rightTangent);
-
-    }
-    void addBranch(GameObject currentBranch, int depth, int maxDepth, Vector3 endPosition, Vector3 startPosition, ref int order)
-    {
-        float thickness = (float)depth / (float)maxDepth;
-        var spline = currentBranch.GetComponent<SpriteShapeController>().spline;
-        currentBranch.GetComponent<SpriteShapeRenderer>().sortingOrder = order;
-        order -= 2;
-        var currentBranchCount = spline.GetPointCount();
-        spline.InsertPointAt(currentBranchCount, endPosition);
-        spline.SetHeight(currentBranchCount, thickness * treeThickness * treeThicknessScale);
-        //spline.SetTangentMode(currentBranchCount, ShapeTangentMode.Continuous);
-        Smoothen(currentBranch.GetComponent<SpriteShapeController>(), currentBranchCount - 1);
-        currentBranch.GetComponent<SpriteShapeController>().spriteShape = curveBranchTextures[branchTextureIndex];
-    }
+    
     void addBranch2(GameObject currentBranch, float thickness, Vector3 endPosition, Vector3 startPosition, ref int order)
     {
-        var spline = currentBranch.GetComponent<SpriteShapeController>().spline;
+        
         currentBranch.GetComponent<SpriteShapeRenderer>().sortingOrder = order;
         order -= 2;
-        var currentBranchCount = spline.GetPointCount();
-        spline.InsertPointAt(currentBranchCount, endPosition);
-        spline.SetHeight(currentBranchCount, thickness * treeThickness);
-        //spline.SetTangentMode(currentBranchCount, ShapeTangentMode.Continuous);
-        Smoothen(currentBranch.GetComponent<SpriteShapeController>(), currentBranchCount - 1);
+
+        currentBranch.GetComponent<BranchGrowth>().addPoint(startPosition,endPosition, branchIndex, thickness * treeThickness);
         currentBranch.GetComponent<SpriteShapeController>().spriteShape = curveBranchTextures[branchTextureIndex];
     }
 
@@ -365,6 +289,7 @@ public class FractalPlant : MonoBehaviour
     Stack<BracketStackData> bracketStack = new Stack<BracketStackData>();
     int goIndex = 0;
     Dictionary<GameObject, float> goToWidth;
+    int branchIndex;
     void splitAndGenerateBranchData(string str, int offset, Transform parent, int originalBranchDataIndex,float width, List<int> isNewList = null)
     {
 
@@ -384,57 +309,75 @@ public class FractalPlant : MonoBehaviour
         data.fowardCurve = (1 - Random.Range(0, 2) * 2) * Random.Range(2, forwardCurve);
         bool isNew = true;
         int bracketIndex = 0;
+        branchIndex = 0;
         for (int i = offset; i < str.Length; i++)
         {
             switch (str[i])
             {
                 case 'F':
+                    //if this has an original branch, update current branch(sprite shape) to its branch
+                    // else if it is new, create a sprite shape
                     data.str += 'F';
                     data.gos.Add(null);
-
-
+                    //do we need isNew? or just check currentBranch is null
                     if (isNew)
                     {
 
-                        Debug.Log("width in use " + width);
-                        currentBranch = Instantiate(curveBranchPrefab, parent);
-                        currentBranch.GetComponent<SpriteShapeController>().spline.Clear();
-                        addBranch2(currentBranch, width, currentPosition, currentPosition, ref order);
-                        isNew = false;
+                        if (originalBranchDataIndex >= 0 && branchData[originalBranchDataIndex].branch)
+                        {
+                            currentBranch = branchData[originalBranchDataIndex].branch;
+                        }
+                        else
+                        {
+                            currentBranch = Instantiate(curveBranchPrefab, parent);
+                            currentBranch.GetComponent<SpriteShapeController>().spline.Clear();
+                            addBranch2(currentBranch, width, currentPosition, currentPosition, ref order);
+                        }
                         data.branch = currentBranch;
+                        isNew = false;
                     }
 
                     width *= widthDecrease;
 
-                    drawForward2(DrawType.branch, i > currentIteration ? data.fowardCurve : 0, ref currentPosition, ref currentRotation, parent.gameObject, ref order, currentBranch, width);
+                    branchIndex++;
+                    //update branch(sprite shape), this would draw a line
+                    if (originalBranchDataIndex>=0 && isNewList[i] >= 0)
+                    {
+                        calculateNextPosition(i > currentIteration ? data.fowardCurve : 0, ref currentPosition, ref currentRotation,currentBranch,width);
 
-                    // tempLongest++;
-                    //thicknessStack.Add(i);
-                    break;
-                case '[':
-                    data.str += '[';
-
-                    if (isNewList!=null && isNewList[i]>=0)
+                    }
+                    else
                     {
 
+                        drawForward2(DrawType.branch, i > currentIteration ? data.fowardCurve : 0, ref currentPosition, ref currentRotation, parent.gameObject, ref order, currentBranch, width);
+                    }
+
+                    break;
+                case '[':
+                    //there potentially be another branch, add a gameobject here.
+                    // if this is not a new one, dont add, instead update gameobject rotation and position
+                    data.str += '[';
+
+                    if (isNewList!=null && isNewList[i]>=0 && branchData[originalBranchDataIndex].gos[isNewList[i]])
+                    {
+                        
                         GameObject go = branchData[originalBranchDataIndex].gos[isNewList[i]];
                         
                         go.transform.parent = parent;
 
-                        //go.transform.SetPositionAndRotation(currentPosition, Quaternion.Euler(0, 0, currentRotation));
-                        go.transform.localPosition = currentPosition;
+                        //go.transform.localPosition = currentPosition;
                         go.transform.rotation = parent.rotation;
                         go.transform.Rotate(Vector3.forward, currentRotation);
-                        //go.transform.localRotation.SetEulerRotation(0, 0, currentRotation);
-                        data.gos.Add(go);
+                        //data.gos.Add(go);
                         bracketStack.Push(new BracketStackData(go, width));
 
 
-                        maxY = Mathf.Max(go.transform.position.y, maxY);
-                        minY = Mathf.Min(go.transform.position.y, minY);
-                        maxX = Mathf.Max(go.transform.position.x, maxX);
-                        minX = Mathf.Min(go.transform.position.x, minX);
+                        //maxY = Mathf.Max(go.transform.position.y, maxY);
+                        //minY = Mathf.Min(go.transform.position.y, minY);
+                        //maxX = Mathf.Max(go.transform.position.x, maxX);
+                        //minX = Mathf.Min(go.transform.position.x, minX);
 
+                        //if 
                         if(originalBranchDataIndex>=0 && bracketIndex < branchData[originalBranchDataIndex].bracketToChildIndex.Count)
                         {
 
@@ -445,6 +388,15 @@ public class FractalPlant : MonoBehaviour
                         }
 
                         goToWidth[go] = width;
+                        if(currentBranch)
+                        {
+
+                            currentBranch.GetComponent<BranchGrowth>().addObject(go, branchIndex);
+                        }
+                        else
+                        {
+                            //Debug.LogError("no branch?");
+                        }
                     }
                     else
                     {
@@ -452,43 +404,45 @@ public class FractalPlant : MonoBehaviour
 
                         GameObject go = new GameObject("go" + goIndex);
                         goIndex++;
-                        //go.transform.SetPositionAndRotation(currentPosition, Quaternion.Euler(0,0, currentRotation));
                         go.transform.parent = parent;
-                        go.transform.localPosition = currentPosition;
+                        //go.transform.localPosition = currentPosition;
                         go.transform.rotation = parent.rotation;
                         go.transform.Rotate(Vector3.forward, currentRotation);
 
 
-                        maxY = Mathf.Max(go.transform.position.y, maxY);
-                        minY = Mathf.Min(go.transform.position.y, minY);
-                        maxX = Mathf.Max(go.transform.position.x, maxX);
-                        minX = Mathf.Min(go.transform.position.x, minX);
-                        //go.transform.localRotation.SetEulerRotation(0, 0, currentRotation);
+                        //maxY = Mathf.Max(go.transform.position.y, maxY);
+                        //minY = Mathf.Min(go.transform.position.y, minY);
+                        //maxX = Mathf.Max(go.transform.position.x, maxX);
+                        //minX = Mathf.Min(go.transform.position.x, minX);
+
                         data.gos.Add(go);
                         bracketStack.Push(new BracketStackData(go, width));
                         goToWidth[go] = width;
+                        if (currentBranch)
+                        {
+
+                            currentBranch.GetComponent<BranchGrowth>().addObject(go, branchIndex);
+                        }
+                        else
+                        {
+                            //Debug.LogError("no branch?");
+                        }
                     }
 
                     //wasABracket = true;
                     //stack.Add(new StackData(currentPosition, currentRotation, currentObject, thicknessStack[thicknessStack.Count - 1]));
                     break;
                 case ']':
+                    //end of a branch
                     data.gos.Add(null);
                     if(data.str.Length==0)
                     {
                         return;
                     }
                     data.str += str[i];
+                    // if this is the original branch, dont do anything, otherwise add this branch data
                     if (originalBranchDataIndex>=0)
                     {
-                        //foreach (var g in branchData[originalBranchDataIndex].gos)
-                        //{
-                        //    foreach (var ssc in g.GetComponentsInChildren<SpriteRenderer>())
-                        //    {
-                        //        ssc.enabled = false;
-                        //    }
-                        //}
-                        Destroy( branchData[originalBranchDataIndex].branch);
                         branchData[originalBranchDataIndex] = data;
                     }
                     else
@@ -499,7 +453,6 @@ public class FractalPlant : MonoBehaviour
                     var popGo = bracketStack.Pop();
 
                     data.startWidth = popGo.width;
-                    Debug.Log("width " + popGo.width);
 
 
                     data.bracketToChildIndex.Insert(0, branchData.Count);
@@ -523,98 +476,6 @@ public class FractalPlant : MonoBehaviour
         }
     }
 
-    void addBranches()
-    {
-        foreach (var branch in branchData)
-        {
-            Vector3 currentPosition = Vector3.zero;
-            float currentRotation = 90;
-            float width = 1;
-            if (branch.str.Contains("F"))
-            {
-                //add sprite shape
-                GameObject currentBranch = Instantiate(curveBranchPrefab, branch.parent);
-                currentBranch.GetComponent<SpriteShapeController>().spline.Clear();
-                addBranch(currentBranch, 1, 1, currentPosition, currentPosition, ref order);
-
-                for (int i = 0; i < branch.str.Length; i++)
-                {
-                    switch (branch.str[i])
-                    {
-                        case 'F':
-                            //var parentObject = currentObject;
-                            //if (Random.Range(0.0f, 1.0f) > 0.7f)
-                            //{
-                            //drawForward(DrawType.leaf, ref currentPosition, currentRotation, currentObject);
-                            //}
-                            drawForward2(DrawType.branch, i > currentIteration ? branch.fowardCurve : 0, ref currentPosition, ref currentRotation, branch.parent.gameObject, ref order, currentBranch, width);
-                            width *= 0.8f;
-                            //currentObject = 
-                            //lastThickness = thicknessValue[i];
-                            //currentObject = drawForward(DrawType.branch, ref currentPosition, currentRotation, currentObject);
-                            //if (parentObject.transform.rotation.eulerAngles != currentObject.transform.rotation.eulerAngles && parentObject != parent)
-                            //{
-                            //    currentObject.GetComponent<RotateByTime>().enabled = true;
-
-                            //}
-                            //else
-                            //{
-
-                            //    currentObject.GetComponent<RotateByTime>().enabled = false;
-                            //}
-                            break;
-                        case '+':
-                            currentRotation += rotationDegree + Random.Range(-rotationDegreeRandom, rotationDegreeRandom);
-                            break;
-                        case '-':
-                            currentRotation -= rotationDegree + Random.Range(-rotationDegreeRandom, rotationDegreeRandom);
-                            break;
-                        case '[':
-                            branch.gos[i].transform.position = currentPosition;
-                            branch.gos[i].transform.rotation.SetEulerRotation(0, 0, currentRotation);
-                            //wasABracket = true;
-                            //stack.Add(new StackData(currentPosition, currentRotation, currentObject, lastThickness));
-                            break;
-                        case ']':
-
-                            //drawForward(Random.Range(0.0f, 1.0f) > 0.25 ? DrawType.leaf : DrawType.blossom, 0, ref currentPosition, ref currentRotation, currentObject, ref order);
-                            //var value = stack[stack.Count - 1];
-                            //stack.RemoveAt(stack.Count - 1);
-
-                            //currentPosition = Vector3.zero;
-                            //currentRotation = value.degree;
-                            //lastThickness = value.branchDepth;
-                            //if (currentObject != value.parent)
-                            //{
-
-                            //    if (currentBranch.GetComponent<SpriteShapeController>().spline.GetPointCount() <= 1)
-                            //    {
-
-                            //    }
-                            //    else
-                            //    {
-
-                            //        currentBranch = Instantiate(curveBranchPrefab, currentObject.transform);
-                            //        currentForwardCurve = (1 - Random.Range(0, 2) * 2) * Random.Range(2, forwardCurve);
-                            //    }
-                            //    currentBranch.GetComponent<SpriteShapeController>().spline.Clear();
-
-                            //    addBranch(currentBranch, lastThickness, longestFCount, currentPosition, currentPosition, ref order);
-                            //}
-
-                           // currentObject = value.parent;
-
-                            //currentBranch.GetComponent<SpriteShapeController>().spline.InsertPointAt(0, currentPosition);
-                            //currentBranch.GetComponent<SpriteShapeController>().spline.SetHeight(0, 1);
-
-                            break;
-
-                    }
-
-                }
-            }
-        }
-    }
 
     string Xr = "F+[[X]-X]-F[-FX][+X]";
     string Xr1 = "F-[[X]+X]+F[+FX]-X";
@@ -629,7 +490,7 @@ public class FractalPlant : MonoBehaviour
     {
         goIndex = 0;
         hasStarted = false;
-        Xrs = new List<string>() { Xr ,Xr1,Xr5};
+        Xrs = new List<string>() { XrTest };
         flowersAndLeaves = new List<SpriteRenderer>();
         List<char> res = new List<char>() { 'X' };
         //var Fr = "FF";
@@ -654,6 +515,10 @@ public class FractalPlant : MonoBehaviour
         camera.orthographicSize = (maxY - minY) / 2;
     }
 
+    void growOneBranch()
+    {
+
+    }
 
     void nextIteration()
     {
@@ -671,10 +536,11 @@ public class FractalPlant : MonoBehaviour
                 {
                     case 'F':
                         newStr+=Fr;
-                        for(int k = 0; k < Fr.Length; k++)
+                        isNew.Add(j);
+                        for (int k = 1; k < Fr.Length; k++)
                         {
 
-                            isNew.Add(j);
+                            isNew.Add(-1);
                         }
                         break;
                     case 'X':
@@ -700,209 +566,6 @@ public class FractalPlant : MonoBehaviour
         camera.transform.position = new Vector3((maxX + minX) / 2f, (maxY + minY) / 2, camera.transform.position.z);
         camera.orthographicSize = (maxY - minY) / 2;
     }
-
-    void drawTree2()
-    {
-        flowersAndLeaves = new List<SpriteRenderer>();
-        List<char> res = new List<char>() { 'X' };
-
-        curveTable.Add(res);
-
-        int test = 0;
-        for (int i = 0; i <= currentIteration; i++)
-        {
-            List<char> newRes = new List<char>();
-            for (int j = 0; j < res.Count; j++)
-            {
-                switch (res[j])
-                {
-                    case 'F':
-                        newRes.AddRange(Fr);
-                        break;
-                    case 'X':
-                        newRes.AddRange(Xrs[Random.Range(0, Xrs.Count)]);
-                        break;
-                    default:
-                        newRes.Add(res[j]);
-                        break;
-                }
-                //test++;
-                //if (test > 1000)
-                //{
-                //    break;
-                //}
-            }
-            res = newRes;
-            //if (test > 1000)
-            //{
-            //    break;
-            //}
-            curveTable.Add(res);
-        }
-
-
-
-        maxX = 0;
-        minX = 0;
-        maxY = 0;
-        minY = 0;
-        //Debug.Log("current iteration " + currentIteration);
-        Vector3 currentPosition = new Vector3(0, 0, 0);
-        float currentRotation = 90;
-        GameObject currentObject;
-        if (parent)
-        {
-            Destroy(parent);
-        }
-        parent = new GameObject();
-        currentObject = parent;
-
-        List<StackData> stack = new List<StackData>();
-
-        order = 1000;
-        bool wasABracket = false;
-
-        int longestFCount = 0;
-        //int tempLongest = 0;
-
-
-        List<int> thicknessStack = new List<int>();
-
-        List<int> thicknessValue = new List<int>();
-        for (int i = 0; i < curveTable[currentIteration].Count; i++)
-        {
-            thicknessValue.Add(0);
-        }
-
-        for (int i = 0; i < curveTable[currentIteration].Count; i++)
-        {
-            switch (curveTable[currentIteration][i])
-            {
-                case 'F':
-                    // tempLongest++;
-                    thicknessStack.Add(i);
-                    break;
-                case '[':
-                    wasABracket = true;
-                    stack.Add(new StackData(currentPosition, currentRotation, currentObject, thicknessStack[thicknessStack.Count - 1]));
-                    break;
-                case ']':
-                    var value = stack[stack.Count - 1];
-                    stack.RemoveAt(stack.Count - 1);
-                    for (int j = 0; j < thicknessStack.Count; j++)
-                    {
-                        var id = thicknessStack[thicknessStack.Count - j - 1];
-                        thicknessValue[id] = Mathf.Max(thicknessValue[id], j);
-                        longestFCount = Mathf.Max(j, longestFCount);
-                    }
-                    //int test = 0;
-                    while (thicknessStack[thicknessStack.Count - 1] != value.branchDepth)
-                    {
-                        thicknessStack.RemoveAt(thicknessStack.Count - 1);
-
-                        //test++;
-                        //if (test > 1000)
-                        //{
-                        //    Debug.LogError("?");
-                        //    break;
-                        //}
-                    }
-                    //tempLongest = value.branchDepth;
-                    break;
-            }
-        }
-        // int FCount = 0;
-
-        // Debug.Log(longestFCount);
-
-
-        GameObject currentBranch = Instantiate(curveBranchPrefab, currentObject.transform);
-        currentBranch.GetComponent<SpriteShapeController>().spline.Clear();
-
-        addBranch(currentBranch, thicknessValue[0], longestFCount, currentPosition, currentPosition, ref order);
-        //currentBranch.GetComponent<SpriteShapeController>().spline.InsertPointAt(0, currentPosition);
-        //currentBranch.GetComponent<SpriteShapeController>().spline.SetHeight(0, 1);
-        int lastThickness = 0;
-
-        float currentForwardCurve = (1 - Random.Range(0, 2) * 2) * Random.Range(2, forwardCurve);
-
-        for (int i = 0; i < curveTable[currentIteration].Count; i++)
-        {
-            switch (curveTable[currentIteration][i])
-            {
-                case 'F':
-                    var parentObject = currentObject;
-                    if (Random.Range(0.0f, 1.0f) > 0.7f)
-                    {
-                        //drawForward(DrawType.leaf, ref currentPosition, currentRotation, currentObject);
-                    }
-                    currentObject = drawForward(DrawType.branch, i > currentIteration ? currentForwardCurve : 0, ref currentPosition, ref currentRotation, currentObject, ref order, currentBranch, thicknessValue[i], longestFCount);
-                    lastThickness = thicknessValue[i];
-                    //currentObject = drawForward(DrawType.branch, ref currentPosition, currentRotation, currentObject);
-                    if (parentObject.transform.rotation.eulerAngles != currentObject.transform.rotation.eulerAngles && parentObject != parent)
-                    {
-                        currentObject.GetComponent<RotateByTime>().enabled = true;
-
-                    }
-                    else
-                    {
-
-                        currentObject.GetComponent<RotateByTime>().enabled = false;
-                    }
-                    break;
-                case '+':
-                    currentRotation += rotationDegree + Random.Range(-rotationDegreeRandom, rotationDegreeRandom);
-                    break;
-                case '-':
-                    currentRotation -= rotationDegree + Random.Range(-rotationDegreeRandom, rotationDegreeRandom);
-                    break;
-                case '[':
-                    wasABracket = true;
-                    stack.Add(new StackData(currentPosition, currentRotation, currentObject, lastThickness));
-                    break;
-                case ']':
-
-                    drawForward(Random.Range(0.0f, 1.0f) > 0.25 ? DrawType.leaf : DrawType.blossom, 0, ref currentPosition, ref currentRotation, currentObject, ref order);
-                    var value = stack[stack.Count - 1];
-                    stack.RemoveAt(stack.Count - 1);
-
-                    currentPosition = Vector3.zero;
-                    currentRotation = value.degree;
-                    lastThickness = value.branchDepth;
-                    if (currentObject != value.parent)
-                    {
-
-                        if (currentBranch.GetComponent<SpriteShapeController>().spline.GetPointCount() <= 1)
-                        {
-
-                        }
-                        else
-                        {
-
-                            currentBranch = Instantiate(curveBranchPrefab, currentObject.transform);
-                            currentForwardCurve = (1 - Random.Range(0, 2) * 2) * Random.Range(2, forwardCurve);
-                        }
-                        currentBranch.GetComponent<SpriteShapeController>().spline.Clear();
-
-                        addBranch(currentBranch, lastThickness, longestFCount, currentPosition, currentPosition, ref order);
-                    }
-
-                    currentObject = value.parent;
-
-                    //currentBranch.GetComponent<SpriteShapeController>().spline.InsertPointAt(0, currentPosition);
-                    //currentBranch.GetComponent<SpriteShapeController>().spline.SetHeight(0, 1);
-
-                    break;
-
-            }
-
-        }
-
-
-        camera.transform.position = new Vector3((maxX + minX) / 2f, (maxY + minY) / 2, camera.transform.position.z);
-        camera.orthographicSize = (maxY - minY) / 2;
-    }
-
 
     void UpdateIterationLabel()
     {
