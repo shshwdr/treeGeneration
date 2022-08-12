@@ -123,6 +123,67 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &74571988
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 74571989}
+  - component: {fileID: 74571990}
+  m_Layer: 0
+  m_Name: honda tree
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &74571989
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74571988}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &74571990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74571988}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40f72c853e2a1ce49a19721da6aca16c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  initRadius: 300
+  treeThickness: 2
+  branchCurve: 0.3
+  forwardCurve: 10
+  rotationDegree: 25
+  rotationDegreeRandom: 5
+  iteration: 1
+  length: 0.5
+  branchPrefab: {fileID: 1827870571615651222, guid: 0ac01edfb63be5b4c98c87196b77600a,
+    type: 3}
+  leafPrefab: {fileID: 3946775410038995901, guid: b4d6e6a608eceb142b91a9ea5c51e5ca,
+    type: 3}
+  flowerPrefab: {fileID: 3129582152165941444, guid: 82409830a691d5d4cb624f8c6381e97f,
+    type: 3}
+  curveBranchPrefab: {fileID: 4853213946311999419, guid: 397672525b0d610478c094d693bfb07d,
+    type: 3}
+  curveBranchTextures:
+  - {fileID: 11400000, guid: 3c927e1bbd03ff74c8d327e3bfcbd9a3, type: 2}
 --- !u!1 &96041188
 GameObject:
   m_ObjectHideFlags: 0
@@ -251,7 +312,7 @@ GameObject:
   - component: {fileID: 280655761}
   - component: {fileID: 280655760}
   m_Layer: 5
-  m_Name: flower
+  m_Name: ButtonToggleFlower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -714,6 +775,167 @@ RectTransform:
   m_AnchoredPosition: {x: -5, y: 0}
   m_SizeDelta: {x: -20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &597865654
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 597865657}
+  - component: {fileID: 597865656}
+  - component: {fileID: 597865655}
+  m_Layer: 0
+  m_Name: shape-wood1 1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &597865655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 597865654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90539df1cd5704abcb25fec9f3f5f84b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Spline:
+    m_IsOpenEnded: 1
+    m_ControlPoints:
+    - position: {x: -2, y: 0, z: 0}
+      leftTangent: {x: 0, y: 0, z: 0}
+      rightTangent: {x: 0, y: 0, z: 0}
+      mode: 0
+      height: 1
+      bevelCutoff: 0
+      bevelSize: 0
+      spriteIndex: 0
+      corner: 1
+      m_CornerMode: 1
+    - position: {x: -0.9586163, y: 0.6140156, z: 0}
+      leftTangent: {x: -0.40276173, y: -0.013091503, z: 0}
+      rightTangent: {x: 0.4536885, y: 0.014746844, z: -0}
+      mode: 1
+      height: 1
+      bevelCutoff: 0
+      bevelSize: 0
+      spriteIndex: 1
+      corner: 1
+      m_CornerMode: 1
+    - position: {x: 0.2568841, y: 0, z: 0}
+      leftTangent: {x: 0, y: 0, z: 0}
+      rightTangent: {x: 0, y: 0, z: 0}
+      mode: 0
+      height: 1
+      bevelCutoff: 0
+      bevelSize: 0
+      spriteIndex: 0
+      corner: 1
+      m_CornerMode: 1
+    - position: {x: 2, y: 0, z: 0}
+      leftTangent: {x: 0, y: 0, z: 0}
+      rightTangent: {x: 0, y: 0, z: 0}
+      mode: 0
+      height: 1
+      bevelCutoff: 0
+      bevelSize: 0
+      spriteIndex: 0
+      corner: 1
+      m_CornerMode: 1
+  m_SpriteShape: {fileID: 11400000, guid: 548e79a2e3485714287f97ab8f999e18, type: 2}
+  m_FillPixelPerUnit: 100
+  m_StretchTiling: 1
+  m_SplineDetail: 16
+  m_AdaptiveUV: 1
+  m_StretchUV: 0
+  m_WorldSpaceUV: 0
+  m_CornerAngleThreshold: 30
+  m_ColliderDetail: 16
+  m_ColliderOffset: 0
+  m_UpdateCollider: 1
+  m_OptimizeCollider: 1
+  m_OptimizeGeometry: 1
+  m_EnableTangents: 0
+  m_GeometryCached: 0
+  m_UTess2D: 0
+--- !u!1971053207 &597865656
+SpriteShapeRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 597865654}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_MaskInteraction: 0
+  m_ShapeTexture: {fileID: 0}
+  m_Sprites:
+  - {fileID: 21300000, guid: e7cbf6e75e491274dba0db1af45902e5, type: 3}
+  - {fileID: 21300000, guid: a0463683db7774948b0d1ba76be191e4, type: 3}
+  - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
+  - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
+  - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
+  - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
+  - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
+  - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
+  - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
+  - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
+  m_LocalAABB:
+    m_Center: {x: -0.09012151, y: 0.30693787, z: 0}
+    m_Extent: {x: 2.0901217, y: 0.57193786, z: 0}
+--- !u!4 &597865657
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 597865654}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &678758918
 GameObject:
   m_ObjectHideFlags: 0
@@ -878,23 +1100,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a55caceb95fbc3b4e84396a93d5bef84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonSplit: {fileID: 678758920}
-  buttonChangeWood: {fileID: 1289665784}
-  buttonMerge: {fileID: 1375210437}
-  buttonRefresh: {fileID: 1915793337}
-  buttonToggleFlower: {fileID: 280655760}
-  forwardCurveSlider: {fileID: 459604705}
-  labelIteration: {fileID: 1163585028}
-  lineGenerator: {fileID: 808492495}
   initRadius: 300
-  treeThickness: 2
+  treeThickness: 0.1
   branchCurve: 0.33
-  forwardCurve: 10
-  rotationDegree: 20
-  rotationDegreeRandom: 10
+  forwardCurve: 0
+  rotationDegree: 55
+  rotationDegreeRandom: 0
   iteration: 1
-  length: 0.3
-  camera: {fileID: 519420031}
+  length: 0.05
+  widthDecrease: 0.8
+  treeThicknessScale: 2
   branchPrefab: {fileID: 1827870571615651222, guid: 0ac01edfb63be5b4c98c87196b77600a,
     type: 3}
   leafPrefab: {fileID: 3946775410038995901, guid: b4d6e6a608eceb142b91a9ea5c51e5ca,
@@ -905,7 +1120,7 @@ MonoBehaviour:
     type: 3}
   curveBranchTextures:
   - {fileID: 11400000, guid: 3c927e1bbd03ff74c8d327e3bfcbd9a3, type: 2}
-  - {fileID: 11400000, guid: 02aa8d3bbd7b6fa4dbbd9e0979088cea, type: 2}
+  - {fileID: 11400000, guid: 11e986b7bb6151b4a887c74171494b8c, type: 2}
   - {fileID: 11400000, guid: effbbcb186be8874aadba9e70f14863e, type: 2}
   - {fileID: 11400000, guid: 346f5544861484246987b856df087acc, type: 2}
   - {fileID: 11400000, guid: 7645440c7dd548e4da61ef13a608cf71, type: 2}
@@ -2147,7 +2362,7 @@ GameObject:
   - component: {fileID: 1915793338}
   - component: {fileID: 1915793337}
   m_Layer: 5
-  m_Name: refresh
+  m_Name: ButtonRefresh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
