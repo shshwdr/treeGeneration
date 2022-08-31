@@ -109,7 +109,8 @@ public class BranchGrowth : MonoBehaviour
             spline.SetHeight(currentBranchCount, width);
             //spline.SetTangentMode(currentBranchCount, ShapeTangentMode.Continuous);
             Smoothen(splineController, branchIndex - 1);
-           // Smoothen(splineController, branchIndex);
+            Smoothen(splineController, branchIndex);
+            // Smoothen(splineController, branchIndex);
         }
         targetData.Insert(branchIndex, new BranchData(endPosition, width));
     }
@@ -138,15 +139,17 @@ public class BranchGrowth : MonoBehaviour
                 var dir = targetPosition - pointPosition;
                 dir.Normalize();
                 spline.SetPosition(i, pointPosition + dir * growSpeed * Time.deltaTime);
+                Smoothen(splineController, i);
             }
             else
             {
                 spline.SetPosition(i, targetPosition);
+                Smoothen(splineController, i);
             }
 
             foreach(var pair in attachedGameObjectToIndex)
             {
-                if(pair.Value-1 == i)
+                if(pair.Value == i)
                 {
                     pair.Key.transform.localPosition = spline.GetPosition(i);
                 }
@@ -158,21 +161,25 @@ public class BranchGrowth : MonoBehaviour
     private void Smoothen(SpriteShapeController sc, int pointIndex)
 
     {
-        if (pointIndex < 1)
+        if (pointIndex < 0)
         {
             return;
         }
         Vector3 position = sc.spline.GetPosition(pointIndex);
 
-        Vector3 positionNext = sc.spline.GetPosition(SplineUtility.NextIndex(pointIndex, sc.spline.GetPointCount()));
 
-        Vector3 positionPrev = sc.spline.GetPosition(SplineUtility.PreviousIndex(pointIndex, sc.spline.GetPointCount()));
+        Vector3 positionNext = pointIndex < targetData.Count - 1 ? targetData[pointIndex + 1].position : position;
+        Vector3 positionPrev = pointIndex > 0 ? targetData[pointIndex - 1].position : position;
+
+        //Vector3 positionNext = sc.spline.GetPosition(SplineUtility.NextIndex(pointIndex, sc.spline.GetPointCount()));
+
+        //Vector3 positionPrev = sc.spline.GetPosition(SplineUtility.PreviousIndex(pointIndex, sc.spline.GetPointCount()));
 
         Vector3 forward = gameObject.transform.forward;
 
 
 
-        float scale = Mathf.Min((positionNext - position).magnitude, (positionPrev - position).magnitude) * branchCurve;
+        float scale = Mathf.Max((positionNext - position).magnitude, (positionPrev - position).magnitude) * branchCurve;
 
 
 
@@ -183,6 +190,7 @@ public class BranchGrowth : MonoBehaviour
 
 
         sc.spline.SetTangentMode(pointIndex, ShapeTangentMode.Continuous);
+        
 
         SplineUtility.CalculateTangents(position, positionPrev, positionNext, forward, scale, out rightTangent, out leftTangent);
 

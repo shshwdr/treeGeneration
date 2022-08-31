@@ -173,6 +173,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b018adb4100b7214c8e78b683ae91425, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  growSpeed: 5
-  branchCurve: 0.3
+  growSpeed: 2
+  branchCurve: 0.5
   equalAllowance: 0.01

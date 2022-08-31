@@ -23,8 +23,12 @@ public class FractalPlant : MonoBehaviour
     float rotationDegreeRandom = 5;
     [SerializeField]
     int iteration = 1;
-    [SerializeField]
     float length = 60;
+    [SerializeField]
+    float originalLength = 2;
+
+
+    [SerializeField] float lengthDecrease = 0.9f;
 
     [SerializeField] float widthDecrease = 0.9f;
     [SerializeField] float treeThicknessScale = 2;
@@ -110,7 +114,7 @@ public class FractalPlant : MonoBehaviour
 
 
 
-        currentBranch.GetComponent<BranchGrowth>().updatePoint(position, newPosition, branchIndex, thickness * treeThickness);
+       // currentBranch.GetComponent<BranchGrowth>().updatePoint(position, newPosition, branchIndex, thickness * treeThickness);
         position = newPosition;
 
     }
@@ -343,13 +347,13 @@ public class FractalPlant : MonoBehaviour
                     //update branch(sprite shape), this would draw a line
                     if (originalBranchDataIndex>=0 && isNewList[i] >= 0)
                     {
-                        calculateNextPosition(i > currentIteration ? data.fowardCurve : 0, ref currentPosition, ref currentRotation,currentBranch,width);
+                        calculateNextPosition(i > 1 ? data.fowardCurve : 0, ref currentPosition, ref currentRotation,currentBranch,width);
 
                     }
                     else
                     {
 
-                        drawForward2(DrawType.branch, i > currentIteration ? data.fowardCurve : 0, ref currentPosition, ref currentRotation, parent.gameObject, ref order, currentBranch, width);
+                        drawForward2(DrawType.branch, i > 1 ? data.fowardCurve : 0, ref currentPosition, ref currentRotation, parent.gameObject, ref order, currentBranch, width);
                     }
 
                     break;
@@ -479,18 +483,19 @@ public class FractalPlant : MonoBehaviour
 
     string Xr = "F+[[X]-X]-F[-FX][+X]";
     string Xr1 = "F-[[X]+X]+F[+FX]-X";
-    string Xr5 = "F-[[[X]+X]+F[+FX]-X]++FX";
+    string Xr5 = "F-[[[X]+X]+F[+FX]-X][++FX]";
     string Xr2 = "F[+X][-X]FX";
     string Xr3 = "F[+X]F[-X]+X";
     string XrTest = "F[+X][-X]";
     List<string> Xrs;
-    string Fr = "FF";
+    string Fr = "F";
     bool hasStarted = false;
     void drawTree()
     {
+        length = originalLength;
         goIndex = 0;
         hasStarted = false;
-        Xrs = new List<string>() { XrTest };
+        Xrs = new List<string>() {XrTest };
         flowersAndLeaves = new List<SpriteRenderer>();
         List<char> res = new List<char>() { 'X' };
         //var Fr = "FF";
@@ -522,6 +527,7 @@ public class FractalPlant : MonoBehaviour
 
     void nextIteration()
     {
+        length *= lengthDecrease;
         //treeThicknessScale *= 2;
         var originCount = branchData.Count;
         for (int i = 0;i< originCount; i++)
