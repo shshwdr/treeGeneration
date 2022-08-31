@@ -23,6 +23,10 @@ public class BranchGrowth : MonoBehaviour
             position = p;
             width = w;
         }
+        public void setPosition(Vector3 p)
+        {
+            position = p;
+        }
     }
 
     List<BranchData> targetData= new List<BranchData>();
@@ -108,8 +112,8 @@ public class BranchGrowth : MonoBehaviour
             spline.InsertPointAt(branchIndex, NewlastPointPosition);
             spline.SetHeight(currentBranchCount, width);
             //spline.SetTangentMode(currentBranchCount, ShapeTangentMode.Continuous);
-            Smoothen(splineController, branchIndex - 1);
-            Smoothen(splineController, branchIndex);
+            //Smoothen(splineController, branchIndex - 1);
+            //Smoothen(splineController, branchIndex);
             // Smoothen(splineController, branchIndex);
         }
         targetData.Insert(branchIndex, new BranchData(endPosition, width));
@@ -144,7 +148,7 @@ public class BranchGrowth : MonoBehaviour
             else
             {
                 spline.SetPosition(i, targetPosition);
-                Smoothen(splineController, i);
+               // Smoothen(splineController, i);
             }
 
             foreach(var pair in attachedGameObjectToIndex)
@@ -154,6 +158,11 @@ public class BranchGrowth : MonoBehaviour
                     pair.Key.transform.localPosition = spline.GetPosition(i);
                 }
             }
+        }
+
+        foreach(var pair in nodeToBranchIndex)
+        {
+            pair.Key.transform.position = spline.GetPosition(pair.Value);
         }
     }
 
@@ -203,4 +212,19 @@ public class BranchGrowth : MonoBehaviour
     }
 
 
+    public Dictionary<GameObject, int> nodeToBranchIndex = new Dictionary<GameObject, int>();
+
+    public void grow()
+    {
+        var spline = splineController.spline;
+        var currentBranchCount = spline.GetPointCount();
+        var originTargetData = new List<BranchData>(targetData);
+        for (int i = 1; i < currentBranchCount; i++)
+        {
+            var pointPosition = originTargetData[i].position;
+            var lastPosition = originTargetData[i-1].position;
+            var diff = pointPosition - lastPosition;
+            targetData[i] = new BranchData (targetData[i-1].position + diff*2, targetData[i].width);
+        }
+    }
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class TreeGeneration : MonoBehaviour
 {
@@ -20,7 +21,11 @@ public class TreeGeneration : MonoBehaviour
         {
 
             var trans = root.GetComponent<TreeRoot>().getNode();
-            Instantiate(treeRootPrefab, trans.position, trans.rotation, trans);
+            if (trans)
+            {
+
+                Instantiate(treeRootPrefab, trans.position, trans.rotation, trans);
+            }
         }
     }
 
@@ -30,5 +35,12 @@ public class TreeGeneration : MonoBehaviour
         {
             grow();
         }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
     }
+
+
 }

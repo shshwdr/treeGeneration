@@ -182,6 +182,7 @@ public class TreeRoot : MonoBehaviour
 
     Dictionary<GameObject, int> nodeToBranchIndex = new Dictionary<GameObject, int>();
     List<GameObject> unvisitedNode = new List<GameObject>();
+    GameObject currentBranch = null;
     void splitAndGenerateBranchData(string str, int offset, Transform parent, float width, List<int> isNewList = null)
     {
 
@@ -192,7 +193,6 @@ public class TreeRoot : MonoBehaviour
         data.init();
         data.parent = parent;
         data.startWidth = width;
-        GameObject currentBranch = null;
         data.fowardCurve = (1 - Random.Range(0, 2) * 2) * Random.Range(2, forwardCurve);
         bool isNew = true;
         int bracketIndex = 0;
@@ -258,10 +258,22 @@ public class TreeRoot : MonoBehaviour
                     break;
             }
         }
+        currentBranch.GetComponent<BranchGrowth>().nodeToBranchIndex = nodeToBranchIndex;
     }
 
+    public void trunkGrow()
+    {
+        currentBranch.GetComponent<BranchGrowth>().grow();
+        growTime++;
+    }
+    int growTime = 0;
     public Transform getNode()
     {
+        if (growTime <= 0)
+        {
+            trunkGrow();
+            return null;
+        }
         var node = unvisitedNode[0];
         unvisitedNode.RemoveAt(0);
         return node.transform;

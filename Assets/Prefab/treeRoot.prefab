@@ -46,9 +46,9 @@ MonoBehaviour:
   treeRootPrefab: {fileID: 975214966510859458}
   initRadius: 300
   treeThickness: 1
-  forwardCurve: 10
-  rotationDegree: 25
-  rotationDegreeRandom: 5
+  forwardCurve: 20
+  rotationDegree: 55
+  rotationDegreeRandom: 0
   iteration: 1
   originalLength: 2
   lengthDecrease: 0.9
