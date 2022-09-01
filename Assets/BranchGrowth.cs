@@ -73,7 +73,7 @@ public class BranchGrowth : MonoBehaviour
             Smoothen(splineController, branchIndex - 1);
             // Smoothen(splineController, branchIndex);
         }
-        targetData[branchIndex] = new BranchData(endPosition, width);
+        targetData[branchIndex] = new BranchData(endPosition, width * TreeGeneration.Instance.widthScale);
     }
 
     public void addPoint(Vector3 startPosition, Vector3 endPosition, int branchIndex, float width)
@@ -108,7 +108,7 @@ public class BranchGrowth : MonoBehaviour
             var dir = endPosition - lastPointPosition;
             dir.Normalize();
             var NewlastPointPosition = lastPointPosition + dir * growSpeed * 0.1f;
-            Debug.Log("lastPoint " + (branchIndex - 1) + NewlastPointPosition + " " + endPosition);
+           // Debug.Log("lastPoint " + (branchIndex - 1) + NewlastPointPosition + " " + endPosition);
             spline.InsertPointAt(branchIndex, NewlastPointPosition);
             spline.SetHeight(currentBranchCount, width);
             //spline.SetTangentMode(currentBranchCount, ShapeTangentMode.Continuous);
@@ -138,12 +138,19 @@ public class BranchGrowth : MonoBehaviour
         {
             var pointPosition = spline.GetPosition(i);
             var targetPosition = targetData[i].position;
+            var pointWidth =spline.GetHeight(i);
+            var targetWidth = targetData[i].width * TreeGeneration.Instance.widthScale;
             if ((pointPosition - targetPosition).sqrMagnitude>equalAllowance)
             {
                 var dir = targetPosition - pointPosition;
                 dir.Normalize();
                 spline.SetPosition(i, pointPosition + dir * growSpeed * Time.deltaTime);
                 Smoothen(splineController, i);
+            }
+            else if (targetWidth - pointWidth>equalAllowance)
+            {
+
+                spline.SetHeight(i, pointWidth+  growSpeed * Time.deltaTime);
             }
             else
             {
@@ -162,7 +169,7 @@ public class BranchGrowth : MonoBehaviour
 
         foreach(var pair in nodeToBranchIndex)
         {
-            pair.Key.transform.position = spline.GetPosition(pair.Value);
+            pair.Key.transform.position = transform.TransformPoint( spline.GetPosition(pair.Value) );
         }
     }
 

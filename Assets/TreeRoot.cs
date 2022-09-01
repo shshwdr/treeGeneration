@@ -28,7 +28,6 @@ public class TreeRoot : MonoBehaviour
     [SerializeField] float widthDecrease = 0.9f;
     [SerializeField] float treeThicknessScale = 2;
 
-    Camera camera;
     [SerializeField] GameObject branchPrefab;
     [SerializeField] GameObject leafPrefab;
     [SerializeField] GameObject flowerPrefab;
@@ -68,7 +67,6 @@ public class TreeRoot : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        camera = Camera.main;
         drawTree();
     }
 
@@ -83,13 +81,11 @@ public class TreeRoot : MonoBehaviour
     string Fr = "F";
     bool hasStarted = false;
 
+    public bool isTrueRoot;
 
     int branchIndex;
 
-    float maxX = 0;
-    float minX = 0;
-    float maxY = 0.28f;
-    float minY = 0;
+    public float startWidth = 1;
     void drawTree()
     {
         length = originalLength;
@@ -103,12 +99,9 @@ public class TreeRoot : MonoBehaviour
         //branchData = new List<BranchData>();
 
         var start = XrNew;// Xrs[Random.Range(0, Xrs.Count)];
-        
-        splitAndGenerateBranchData(start, 0, transform, 1);
 
+        splitAndGenerateBranchData(start, 0, transform, startWidth);
 
-        camera.transform.position = new Vector3((maxX + minX) / 2f, (maxY + minY) / 2, GetComponent<Camera>().transform.position.z);
-        camera.orthographicSize = (maxY - minY) / 2;
     }
 
     GameObject drawForward2(DrawType type, float curve, ref Vector3 position, ref float degree, GameObject go, ref int order, GameObject currentBranch = null, float width = 1)
@@ -168,12 +161,14 @@ public class TreeRoot : MonoBehaviour
         public Vector3 position;
         public float rotation;
         public int branchIndex;
+        public float width;
 
-        public BracketStackData(Vector3 p, float r,int b)
+        public BracketStackData(Vector3 p, float r, int b,float w)
         {
             position = p;
             rotation = r;
             branchIndex = b;
+            width = w;
         }
     }
     Stack<BracketStackData> bracketStack = new Stack<BracketStackData>();
@@ -181,6 +176,7 @@ public class TreeRoot : MonoBehaviour
     int order = 1000;
 
     Dictionary<GameObject, int> nodeToBranchIndex = new Dictionary<GameObject, int>();
+    Dictionary<GameObject, float> nodeToWidth = new Dictionary<GameObject, float>();
     List<GameObject> unvisitedNode = new List<GameObject>();
     GameObject currentBranch = null;
     void splitAndGenerateBranchData(string str, int offset, Transform parent, float width, List<int> isNewList = null)
@@ -198,7 +194,7 @@ public class TreeRoot : MonoBehaviour
         int bracketIndex = 0;
 
 
-        currentBranch = Instantiate(curveBranchPrefab, parent);
+        currentBranch = Instantiate(curveBranchPrefab, /*parent.transform.position,Quaternion.identity/* Quaternion.EulerAngles(0,0,currentRotation), */parent);
         currentBranch.GetComponent<SpriteShapeController>().spline.Clear();
         addBranch2(currentBranch, width, currentPosition, currentPosition, ref order);
 
@@ -217,23 +213,17 @@ public class TreeRoot : MonoBehaviour
                     width *= widthDecrease;
 
                     branchIndex++;
-                        drawForward2(DrawType.branch, i > 1 ? data.fowardCurve : 0, ref currentPosition, ref currentRotation, parent.gameObject, ref order, currentBranch, width);
-                    
-
+                    drawForward2(DrawType.branch, /*i > 1 ? data.fowardCurve : 0*/0, ref currentPosition, ref currentRotation, parent.gameObject, ref order, currentBranch, width);
                     break;
                 case '[':
-                    //there potentially be another branch, add a gameobject here.
-                    // if this is not a new one, dont add, instead update gameobject rotation and position
-                        bracketStack.Push(new BracketStackData(currentPosition,currentRotation,branchIndex));
-                   
-                    //wasABracket = true;
-                    //stack.Add(new StackData(currentPosition, currentRotation, currentObject, thicknessStack[thicknessStack.Count - 1]));
+                    bracketStack.Push(new BracketStackData(currentPosition, currentRotation, branchIndex, width));
                     break;
                 case ']':
                     var popup = bracketStack.Pop();
                     currentPosition = popup.position;
                     currentRotation = popup.rotation;
                     branchIndex = popup.branchIndex;
+                    width = popup.width;
                     break;
                 case '+':
                     currentRotation += rotationDegree;// + Random.Range(-rotationDegreeRandom, rotationDegreeRandom);
@@ -247,10 +237,17 @@ public class TreeRoot : MonoBehaviour
                     break;
                 case 'X':
                     var go = new GameObject("child");
-                    go.transform.position = currentPosition;
-                    go.transform.Rotate(Vector3.forward, currentRotation);
+                    //go.transform.parent = transform;
+
+                    go.transform.position = new Vector3(1, 1, 1); //transform.TransformPoint(currentPosition);
+                    Debug.Log("transform position " + go.transform.position);
+                    go.transform.localEulerAngles = (new Vector3(0, 0, currentRotation +transform.rotation.eulerAngles.z));
+                    StartCoroutine(test(go));
+                    // go.transform.Rotate(Vector3.forward,/* transform.rotation.eulerAngles.z+*/ currentRotation);
                     nodeToBranchIndex[go] = branchIndex;
+                    nodeToWidth[go] = width;
                     unvisitedNode.Add(go);
+                    TreeGeneration.Instance.updatePosition(go.transform.position);
                     break;
                 default:
                     data.gos.Add(null);
@@ -261,21 +258,43 @@ public class TreeRoot : MonoBehaviour
         currentBranch.GetComponent<BranchGrowth>().nodeToBranchIndex = nodeToBranchIndex;
     }
 
+    IEnumerator test(GameObject go)
+    {
+        yield return new WaitForSeconds(0.1f);
+        go.transform.parent = transform;
+    }
+
     public void trunkGrow()
     {
+        TreeGeneration.Instance.growTrunk();
         currentBranch.GetComponent<BranchGrowth>().grow();
         growTime++;
     }
     int growTime = 0;
-    public Transform getNode()
+    public Transform getNode(ref float width)
     {
         if (growTime <= 0)
         {
             trunkGrow();
             return null;
         }
-        var node = unvisitedNode[0];
-        unvisitedNode.RemoveAt(0);
+
+        var rand = Random.Range(0, unvisitedNode.Count);
+
+        var node = unvisitedNode[rand];
+        if (node.GetComponentInChildren<TreeRoot>())
+        {
+            return node.GetComponentInChildren<TreeRoot>().getNode(ref width);
+        }
+        //unvisitedNode.RemoveAt(0);
+        width = getWidth(node);
         return node.transform;
+    }
+
+
+
+    public float getWidth(GameObject go)
+    {
+        return nodeToWidth[go];
     }
 }

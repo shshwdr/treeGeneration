@@ -835,6 +835,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 678758918}
   m_CullTransparentMesh: 0
+--- !u!1 &725294117
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 725294118}
+  m_Layer: 0
+  m_Name: treeParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &725294118
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 725294117}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &804245463
 GameObject:
   m_ObjectHideFlags: 0
@@ -1064,7 +1094,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1066850484
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1979,6 +2009,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   treeRootPrefab: {fileID: 975214966510859458, guid: 145ef6ff77f8bbd499bf1f895c9103d7,
     type: 3}
+  treeParent: {fileID: 725294118}
+  widthScale: 1
 --- !u!1 &1844564452
 GameObject:
   m_ObjectHideFlags: 0
