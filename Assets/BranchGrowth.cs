@@ -93,7 +93,7 @@ public class BranchGrowth : MonoBehaviour
             spline.InsertPointAt(currentBranchCount, endPosition);
             spline.SetHeight(currentBranchCount, width);
             //spline.SetTangentMode(currentBranchCount, ShapeTangentMode.Continuous);
-            Smoothen(splineController, currentBranchCount - 1);
+            Smoothen(splineController, currentBranchCount);
         }
         else
         {
@@ -221,17 +221,25 @@ public class BranchGrowth : MonoBehaviour
 
     public Dictionary<GameObject, int> nodeToBranchIndex = new Dictionary<GameObject, int>();
 
+    int maxGrowTime = 5;
     public void grow()
     {
-        var spline = splineController.spline;
-        var currentBranchCount = spline.GetPointCount();
-        var originTargetData = new List<BranchData>(targetData);
-        for (int i = 1; i < currentBranchCount; i++)
+        if (maxGrowTime > 0)
         {
-            var pointPosition = originTargetData[i].position;
-            var lastPosition = originTargetData[i-1].position;
-            var diff = pointPosition - lastPosition;
-            targetData[i] = new BranchData (targetData[i-1].position + diff*2, targetData[i].width);
+
+            var spline = splineController.spline;
+            var currentBranchCount = spline.GetPointCount();
+            var originTargetData = new List<BranchData>(targetData);
+            for (int i = 1; i < currentBranchCount; i++)
+            {
+                var pointPosition = originTargetData[i].position;
+                var lastPosition = originTargetData[i - 1].position;
+                var diff = pointPosition - lastPosition;
+                targetData[i] = new BranchData(targetData[i - 1].position + diff * 1.2f, targetData[i].width);
+
+                TreeGeneration.Instance.updatePosition(transform.TransformPoint(targetData[i].position));
+            }
+            maxGrowTime--;
         }
     }
 }

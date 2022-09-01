@@ -72,6 +72,7 @@ public class TreeRoot : MonoBehaviour
 
     string Xr = "F+[[X]-X]-F[-FX][+X]";
     string XrNew = "F+[X][-X]-F[-FX][+X]";
+    string XrNew2 = "F-[X][+X]+F[+FX][-X]";
     string Xr1 = "F-[[X]+X]+F[+FX]-X";
     string Xr5 = "F-[[[X]+X]+F[+FX]-X][++FX]";
     string Xr2 = "F[+X][-X]FX";
@@ -91,14 +92,14 @@ public class TreeRoot : MonoBehaviour
         length = originalLength;
         //goIndex = 0;
         //hasStarted = false;
-        Xrs = new List<string>() { XrTest };
+        Xrs = new List<string>() { XrNew };
         flowersAndLeaves = new List<SpriteRenderer>();
         //List<char> res = XrNew;
         //curveTable.Add(res);
         //goToWidth = new Dictionary<GameObject, float>();
         //branchData = new List<BranchData>();
 
-        var start = XrNew;// Xrs[Random.Range(0, Xrs.Count)];
+        var start =  Xrs[Random.Range(0, Xrs.Count)];
 
         splitAndGenerateBranchData(start, 0, transform, startWidth);
 
@@ -153,6 +154,8 @@ public class TreeRoot : MonoBehaviour
 
         currentBranch.GetComponent<BranchGrowth>().addPoint(startPosition, endPosition, branchIndex, thickness * treeThickness);
         currentBranch.GetComponent<SpriteShapeController>().spriteShape = curveBranchTextures[branchTextureIndex];
+
+        TreeGeneration.Instance.updatePosition(transform.TransformPoint( endPosition));
     }
 
 
@@ -213,7 +216,7 @@ public class TreeRoot : MonoBehaviour
                     width *= widthDecrease;
 
                     branchIndex++;
-                    drawForward2(DrawType.branch, /*i > 1 ? data.fowardCurve : 0*/0, ref currentPosition, ref currentRotation, parent.gameObject, ref order, currentBranch, width);
+                    drawForward2(DrawType.branch, i > 1 ? data.fowardCurve : 0, ref currentPosition, ref currentRotation, parent.gameObject, ref order, currentBranch, width);
                     break;
                 case '[':
                     bracketStack.Push(new BracketStackData(currentPosition, currentRotation, branchIndex, width));
@@ -226,12 +229,12 @@ public class TreeRoot : MonoBehaviour
                     width = popup.width;
                     break;
                 case '+':
-                    currentRotation += rotationDegree;// + Random.Range(-rotationDegreeRandom, rotationDegreeRandom);
+                    currentRotation += rotationDegree + Random.Range(-rotationDegreeRandom, rotationDegreeRandom);
                     data.gos.Add(null);
                     data.str += str[i];
                     break;
                 case '-':
-                    currentRotation -= rotationDegree;// + Random.Range(-rotationDegreeRandom, rotationDegreeRandom);
+                    currentRotation -= rotationDegree + Random.Range(-rotationDegreeRandom, rotationDegreeRandom);
                     data.gos.Add(null);
                     data.str += str[i];
                     break;
@@ -245,9 +248,8 @@ public class TreeRoot : MonoBehaviour
                     StartCoroutine(test(go));
                     // go.transform.Rotate(Vector3.forward,/* transform.rotation.eulerAngles.z+*/ currentRotation);
                     nodeToBranchIndex[go] = branchIndex;
-                    nodeToWidth[go] = width;
+                    nodeToWidth[go] = width;// * widthDecrease;
                     unvisitedNode.Add(go);
-                    TreeGeneration.Instance.updatePosition(go.transform.position);
                     break;
                 default:
                     data.gos.Add(null);
@@ -267,10 +269,12 @@ public class TreeRoot : MonoBehaviour
     public void trunkGrow()
     {
         TreeGeneration.Instance.growTrunk();
-        currentBranch.GetComponent<BranchGrowth>().grow();
+        //currentBranch.GetComponent<BranchGrowth>().grow();
         growTime++;
     }
     int growTime = 0;
+
+
     public Transform getNode(ref float width)
     {
         if (growTime <= 0)
